@@ -1,5 +1,4 @@
 class TrousersCalculator:
-    """Расчёт для брюк"""
     
     FABRIC_PER_SIZE = {
         44: 1.2,
@@ -11,7 +10,7 @@ class TrousersCalculator:
     }
     
     PRICE_PER_METER = 800
-    ACCESSORIES_PRICE = 300  # молния, пуговица
+    ACCESSORIES_PRICE = 300
     WORK_PRICE_PER_METER = 1000
     
     @classmethod
