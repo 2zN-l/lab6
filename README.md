@@ -120,4 +120,14 @@ openpyxl==3.1.2
 - Фиксация конкретных версий гарантирует совместимость и устраняет «эффект неожиданности» при обновлениях библиотек
 - Позволяет установить все зависимости командой pip install -r requirements.txt
 
+<br>
+<br>
+<br>
+
+# Список использованной литературы
+
+1. [Руководство по Tkinter](https://metanit.com/python/tkinter/)
+2. [Python модули и пакеты](https://habr.com/ru/articles/718828/)
+3. [python-docx](https://python-docx.readthedocs.io/en/latest/)
+4. [openpyxl - A Python library to read/write Excel 2010 xlsx/xlsm files](https://openpyxl.readthedocs.io/en/stable/)
 
