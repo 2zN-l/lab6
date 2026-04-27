@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from clothing_package import CoatCalculator, TrousersCalculator, SuitCalculator
+from clothing_package import *
 from docx import Document
 from openpyxl import Workbook
 
@@ -61,13 +61,16 @@ class ClothingApp:
         
         try:
             if clothing == "Пиджак":
-                self.current_result = CoatCalculator.calculate_price(size)
+                calculator = CoatCalculator()  # <-- СОЗДАЁМ ОБЪЕКТ
+                self.current_result = calculator.calculate_price(size)
                 self.display_result(self.current_result)
             elif clothing == "Брюки":
-                self.current_result = TrousersCalculator.calculate_price(size)
+                calculator = TrousersCalculator()  # <-- СОЗДАЁМ ОБЪЕКТ
+                self.current_result = calculator.calculate_price(size)
                 self.display_result(self.current_result)
             elif clothing == "Костюм-тройка":
-                self.current_result = SuitCalculator.calculate_price(size)
+                calculator = SuitCalculator()  # <-- СОЗДАЁМ ОБЪЕКТ
+                self.current_result = calculator.calculate_price(size)
                 self.display_suit_result(self.current_result)
             
             self.save_doc_button.config(state="normal")
