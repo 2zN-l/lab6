@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Расчёт стоимости пошива одежды</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: #2d3748;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .result h3 {
+            margin-top: 0;
+            color: #2d3748;
+        }
+        .result pre {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .save-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .save-buttons button {
+            flex: 1;
+            background: #48bb78;
+        }
+        .save-buttons button:nth-child(2) {
+            background: #4299e1;
+        }
+        .save-buttons button:nth-child(3) {
+            background: #ed8936;
+        }
+        .save-buttons button:hover {
+            filter: brightness(0.9);
+        }
+        .flash-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .flash-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+        .flash-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👔 Расчёт стоимости пошива одежды</h1>
+            <p>Вариант 10: Пиджак, Брюки, Костюм-тройка</p>
+        </div>
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="form-group">
+                    <label>Тип одежды:</label>
+                    <select name="clothing_type">
+                        <option value="Пиджак" {% if clothing_type == 'Пиджак' %}selected{% endif %}>Пиджак</option>
+                        <option value="Брюки" {% if clothing_type == 'Брюки' %}selected{% endif %}>Брюки</option>
+                        <option value="Костюм-тройка" {% if clothing_type == 'Костюм-тройка' %}selected{% endif %}>Костюм-тройка</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Размер (44-54):</label>
+                    <input type="number" name="size" min="44" max="54" value="{{ size or 44 }}">
+                </div>
+                <button type="submit">Рассчитать</button>
+            </form>
+
+            {% if result %}
+            <div class="result">
+                <h3>📊 Результат расчёта:</h3>
+                <pre>{{ result_text }}</pre>
+                
+                <div class="save-buttons">
+                    <form method="POST" action="{{ url_for('save_to_db') }}" style="display: inline; width: 100%;">
+                        <input type="hidden" name="result_json" value="{{ result_json }}">
+                        <button type="submit">💾 Сохранить в БД</button>
+                    </form>
+                    <form method="GET" action="{{ url_for('export_doc') }}" style="display: inline; width: 100%;">
+                        <input type="hidden" name="result_json" value="{{ result_json }}">
+                        <button type="submit">📄 Сохранить в DOC</button>
+                    </form>
+                    <form method="GET" action="{{ url_for('export_xls') }}" style="display: inline; width: 100%;">
+                        <input type="hidden" name="result_json" value="{{ result_json }}">
+                        <button type="submit">📊 Сохранить в XLS</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

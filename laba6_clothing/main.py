@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from clothing_package import *
+from clothing_package.db import DatabaseManager
 from docx import Document
 from openpyxl import Workbook
 
@@ -12,6 +13,8 @@ class ClothingApp:
         self.root.resizable(False, False)
         self.clothing_type = tk.StringVar(value="Пиджак")
         self.size = tk.IntVar(value=44)
+        self.current_result = None
+        self.db_manager = DatabaseManager()
         self.setup_ui()
     
     def setup_ui(self):
@@ -53,7 +56,8 @@ class ClothingApp:
         self.save_xls_button = tk.Button(save_frame, text="Сохранить в XLS", command=self.save_to_xls, bg="#3b4e5e", fg="white", font=("Arial", 11), padx=15, pady=5, state="disabled")
         self.save_xls_button.pack(side="left", padx=5)
         
-        self.current_result = None
+        self.save_db_button = tk.Button(save_frame, text="Сохранить в БД", command=self.save_to_db, bg="#2E8B57", fg="white", font=("Arial", 11), padx=15, pady=5, state="disabled")
+        self.save_db_button.pack(side="left", padx=5)
     
     def calculate(self):
         size = self.size.get()
@@ -61,20 +65,21 @@ class ClothingApp:
         
         try:
             if clothing == "Пиджак":
-                calculator = CoatCalculator()  # <-- СОЗДАЁМ ОБЪЕКТ
+                calculator = CoatCalculator()
                 self.current_result = calculator.calculate_price(size)
                 self.display_result(self.current_result)
             elif clothing == "Брюки":
-                calculator = TrousersCalculator()  # <-- СОЗДАЁМ ОБЪЕКТ
+                calculator = TrousersCalculator()
                 self.current_result = calculator.calculate_price(size)
                 self.display_result(self.current_result)
             elif clothing == "Костюм-тройка":
-                calculator = SuitCalculator()  # <-- СОЗДАЁМ ОБЪЕКТ
+                calculator = SuitCalculator()
                 self.current_result = calculator.calculate_price(size)
                 self.display_suit_result(self.current_result)
             
             self.save_doc_button.config(state="normal")
             self.save_xls_button.config(state="normal")
+            self.save_db_button.config(state="normal")
             
         except Exception as e:
             messagebox.showerror("Ошибка", f"Ошибка расчёта: {str(e)}")
@@ -119,7 +124,7 @@ __________________________________________
     Ткань: {result['vest']['fabric_meters']} м | Стоимость: {result['vest']['total']} руб    
 __________________________________________
 
- ОБЩАЯ СТОИМОСТЬ: {result['total']} руб                      
+  ОБЩАЯ СТОИМОСТЬ: {result['total']} руб                      
 ==========================================
         """
         self.result_text.insert(1.0, text)
@@ -258,6 +263,20 @@ __________________________________________
             
         except Exception as e:
             messagebox.showerror("Ошибка", f"Не удалось сохранить XLS:\n{str(e)}")
+    
+    def save_to_db(self):
+        if not self.current_result:
+            messagebox.showwarning("Предупреждение", "Сначала выполните расчёт!")
+            return
+        
+        try:
+            success = self.db_manager.save_result(self.current_result)
+            if success:
+                messagebox.showinfo("Успех", "Результат успешно сохранён в базу данных PostgreSQL!")
+            else:
+                messagebox.showerror("Ошибка", "Не удалось сохранить результат в БД. Проверьте, запущен ли контейнер Docker.")
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Ошибка при сохранении в БД:\n{str(e)}")
 
 
 if __name__ == "__main__":
