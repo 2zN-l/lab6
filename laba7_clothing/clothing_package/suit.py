@@ -2,8 +2,6 @@ from .coat import CoatCalculator
 from .trousers import TrousersCalculator
 
 class SuitCalculator:
-    """Класс для расчёта костюма-тройки."""
-    
     def __init__(self, size: int):
         self.coat = CoatCalculator(size)
         self.trousers = TrousersCalculator(size)
@@ -26,7 +24,6 @@ class SuitCalculator:
     def size(self) -> int:
         return self.coat.size
     
-    # Dunder-методы
     def __str__(self) -> str:
         return f"{self.type} (Размер: {self.size}, Стоимость: {self.total_cost:.2f} руб.)"
 
@@ -34,7 +31,6 @@ class SuitCalculator:
         return f"SuitCalculator(size={self.size!r})"
     
     def get_result_dict(self) -> dict:
-        """Возвращает словарь с результатами."""
         coat_data = self.coat.get_result_dict()
         trousers_data = self.trousers.get_result_dict()
         

@@ -1,7 +1,6 @@
 from .abc_clothes import Clothes
 
 class CoatCalculator(Clothes):
-    """Класс для расчёта пиджака."""
     
     _FABRIC_DICT = {
         44: 2.2, 46: 2.3, 48: 2.4, 50: 2.5, 52: 2.6, 54: 2.7,
@@ -15,7 +14,6 @@ class CoatCalculator(Clothes):
 
     @property
     def fabric_meters(self) -> float:
-        """Расход ткани для пиджака."""
         normalized_size = self.size
         return self._FABRIC_DICT.get(normalized_size, 2.5)
     

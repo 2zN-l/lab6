@@ -1,7 +1,6 @@
 from .abc_clothes import Clothes
 
 class TrousersCalculator(Clothes):
-    """Класс для расчёта брюк."""
     
     _FABRIC_DICT = {
         44: 1.2, 46: 1.25, 48: 1.3, 50: 1.35, 52: 1.4, 54: 1.45,
