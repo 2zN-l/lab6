@@ -33,8 +33,24 @@
             margin: 0;
             font-size: 28px;
         }
+        .header p {
+            margin: 10px 0 0;
+            opacity: 0.8;
+        }
         .content {
             padding: 30px;
+        }
+        .history-link {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .history-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .history-link a:hover {
+            text-decoration: underline;
         }
         .form-group {
             margin-bottom: 20px;
@@ -57,7 +73,7 @@
             outline: none;
             border-color: #667eea;
         }
-        button {
+        .calc-btn {
             background: #667eea;
             color: white;
             border: none;
@@ -68,7 +84,7 @@
             transition: background 0.3s;
             width: 100%;
         }
-        button:hover {
+        .calc-btn:hover {
             background: #5a67d8;
         }
         .result {
@@ -89,15 +105,28 @@
             overflow-x: auto;
             font-family: 'Courier New', monospace;
             font-size: 14px;
+            white-space: pre-wrap;
         }
         .save-buttons {
             display: flex;
             gap: 10px;
             margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .save-buttons form {
+            flex: 1;
+            min-width: 120px;
         }
         .save-buttons button {
-            flex: 1;
+            width: 100%;
             background: #48bb78;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
         }
         .save-buttons button:nth-child(2) {
             background: #4299e1;
@@ -132,6 +161,10 @@
             <p>Вариант 10: Пиджак, Брюки, Костюм-тройка</p>
         </div>
         <div class="content">
+            <div class="history-link">
+                <a href="/history">📜 Посмотреть историю всех расчётов</a>
+            </div>
+
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
@@ -153,7 +186,7 @@
                     <label>Размер (44-54):</label>
                     <input type="number" name="size" min="44" max="54" value="{{ size or 44 }}">
                 </div>
-                <button type="submit">Рассчитать</button>
+                <button type="submit" class="calc-btn">Рассчитать</button>
             </form>
 
             {% if result %}
@@ -162,15 +195,15 @@
                 <pre>{{ result_text }}</pre>
                 
                 <div class="save-buttons">
-                    <form method="POST" action="{{ url_for('save_to_db') }}" style="display: inline; width: 100%;">
+                    <form method="POST" action="{{ url_for('save_to_db') }}">
                         <input type="hidden" name="result_json" value="{{ result_json }}">
                         <button type="submit">💾 Сохранить в БД</button>
                     </form>
-                    <form method="GET" action="{{ url_for('export_doc') }}" style="display: inline; width: 100%;">
+                    <form method="GET" action="{{ url_for('export_doc') }}">
                         <input type="hidden" name="result_json" value="{{ result_json }}">
                         <button type="submit">📄 Сохранить в DOC</button>
                     </form>
-                    <form method="GET" action="{{ url_for('export_xls') }}" style="display: inline; width: 100%;">
+                    <form method="GET" action="{{ url_for('export_xls') }}">
                         <input type="hidden" name="result_json" value="{{ result_json }}">
                         <button type="submit">📊 Сохранить в XLS</button>
                     </form>

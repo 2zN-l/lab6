@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from clothing_package import *
+from clothing_package import CoatCalculator, TrousersCalculator, SuitCalculator
 from clothing_package.db import DatabaseManager
 from docx import Document
 from openpyxl import Workbook
@@ -96,8 +96,8 @@ class ClothingApp:
 __________________________________________
 
   Расход ткани:   {result['fabric_meters']} м                          
-  Стоимость ткани:{result['fabric_cost']:>8} руб                       
-  Стоимость работы:{result['work_cost']:>7} руб                       
+  Стоимость ткани: {result['fabric_cost']:>8} руб                       
+  Стоимость работы: {result['work_cost']:>7} руб                       
   Фурнитура:      {result['accessories']:>8} руб                       
 __________________________________________
 
@@ -272,9 +272,9 @@ __________________________________________
         try:
             success = self.db_manager.save_result(self.current_result)
             if success:
-                messagebox.showinfo("Успех", "Результат успешно сохранён в базу данных PostgreSQL!")
+                messagebox.showinfo("Успех", "Результат успешно сохранён в базу данных SQLite!")
             else:
-                messagebox.showerror("Ошибка", "Не удалось сохранить результат в БД. Проверьте, запущен ли контейнер Docker.")
+                messagebox.showerror("Ошибка", "Не удалось сохранить результат в БД.")
         except Exception as e:
             messagebox.showerror("Ошибка", f"Ошибка при сохранении в БД:\n{str(e)}")
 

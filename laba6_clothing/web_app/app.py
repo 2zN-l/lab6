@@ -1,15 +1,17 @@
-from flask import Flask, request, render_template, flash, redirect, url_for, send_file, session
-from clothing_package import *
-from clothing_package.db import DatabaseManager
+from flask import Flask, request, render_template, flash, redirect, url_for, send_file
 import json
 import io
-import os
 import sys
+import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from clothing_package import CoatCalculator, TrousersCalculator, SuitCalculator
+from clothing_package.db import DatabaseManager
+
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here-change-in-production'
+
 db_manager = DatabaseManager()
 
 def format_result_for_display(result):
@@ -44,8 +46,8 @@ __________________________________________
 __________________________________________
 
   Расход ткани:   {result['fabric_meters']} м                          
-  Стоимость ткани:{result['fabric_cost']:>8} руб                       
-  Стоимость работы:{result['work_cost']:>7} руб                       
+  Стоимость ткани: {result['fabric_cost']:>8} руб                       
+  Стоимость работы: {result['work_cost']:>7} руб                       
   Фурнитура:      {result['accessories']:>8} руб                       
 __________________________________________
 
@@ -69,18 +71,21 @@ def create_doc_file(result):
         doc.add_paragraph(f"Стоимость работы: {result['coat']['work_cost']} руб")
         doc.add_paragraph(f"Фурнитура: {result['coat']['accessories']} руб")
         doc.add_paragraph(f"Итого пиджак: {result['coat']['total']} руб")
+        
         doc.add_heading('Брюки', level=2)
         doc.add_paragraph(f"Расход ткани: {result['trousers']['fabric_meters']} м")
         doc.add_paragraph(f"Стоимость ткани: {result['trousers']['fabric_cost']} руб")
         doc.add_paragraph(f"Стоимость работы: {result['trousers']['work_cost']} руб")
         doc.add_paragraph(f"Фурнитура: {result['trousers']['accessories']} руб")
         doc.add_paragraph(f"Итого брюки: {result['trousers']['total']} руб")
+        
         doc.add_heading('Жилет', level=2)
         doc.add_paragraph(f"Расход ткани: {result['vest']['fabric_meters']} м")
         doc.add_paragraph(f"Стоимость ткани: {result['vest']['fabric_cost']} руб")
         doc.add_paragraph(f"Стоимость работы: {result['vest']['work_cost']} руб")
         doc.add_paragraph(f"Фурнитура: {result['vest']['accessories']} руб")
         doc.add_paragraph(f"Итого жилет: {result['vest']['total']} руб")
+        
         doc.add_heading('Общая стоимость', level=1)
         doc.add_paragraph(f"ИТОГО: {result['total']} рублей")
     else:
@@ -182,13 +187,17 @@ def index():
             
             result_text = format_result_for_display(result)
             result_json = json.dumps(result, ensure_ascii=False)
-            session['last_result'] = result_json
             flash('Расчёт выполнен успешно!', 'success')
             
         except Exception as e:
             flash(f'Ошибка расчёта: {str(e)}', 'error')
     
-    return render_template('index.html', result=result, result_text=result_text, result_json=result_json, clothing_type=clothing_type, size=size)
+    return render_template('index.html', 
+                         result=result, 
+                         result_text=result_text, 
+                         result_json=result_json, 
+                         clothing_type=clothing_type, 
+                         size=size)
 
 @app.route('/save_to_db', methods=['POST'])
 def save_to_db():
@@ -201,9 +210,9 @@ def save_to_db():
         result = json.loads(result_json)
         success = db_manager.save_result(result)
         if success:
-            flash('Результат успешно сохранён в базу данных PostgreSQL!', 'success')
+            flash('Результат успешно сохранён в базу данных SQLite!', 'success')
         else:
-            flash('Ошибка при сохранении в БД. Проверьте, запущен ли контейнер Docker.', 'error')
+            flash('Ошибка при сохранении в БД.', 'error')
     except Exception as e:
         flash(f'Ошибка при сохранении в БД: {str(e)}', 'error')
     
@@ -219,7 +228,10 @@ def export_doc():
     try:
         result = json.loads(result_json)
         file_stream = create_doc_file(result)
-        return send_file(file_stream, as_attachment=True, download_name=f"report_{result['type']}_{result['size']}.docx", mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        return send_file(file_stream, 
+                        as_attachment=True, 
+                        download_name=f"{result['type']}_{result['size']}.docx", 
+                        mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
     except Exception as e:
         flash(f'Ошибка при экспорте в DOC: {str(e)}', 'error')
         return redirect(url_for('index'))
@@ -234,10 +246,29 @@ def export_xls():
     try:
         result = json.loads(result_json)
         file_stream = create_xls_file(result)
-        return send_file(file_stream, as_attachment=True, download_name=f"report_{result['type']}_{result['size']}.xlsx", mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        return send_file(file_stream, 
+                        as_attachment=True, 
+                        download_name=f"{result['type']}_{result['size']}.xlsx", 
+                        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     except Exception as e:
         flash(f'Ошибка при экспорте в XLS: {str(e)}', 'error')
         return redirect(url_for('index'))
 
+@app.route('/history')
+def history():
+    """Показывает все сохранённые расчёты из БД."""
+    results = db_manager.get_all_results()
+    return render_template('history.html', results=results)
+
+@app.route('/result/<int:result_id>')
+def view_result(result_id):
+    """Показывает детали конкретного расчёта по ID."""
+    result = db_manager.get_result_by_id(result_id)
+    if result:
+        return render_template('result_detail.html', result=result)
+    else:
+        flash('Результат не найден', 'error')
+        return redirect(url_for('history'))
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=8080)

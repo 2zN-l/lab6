@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Детали расчёта</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            padding: 30px;
+        }
+        h1 {
+            color: #2d3748;
+            text-align: center;
+        }
+        .detail-card {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .detail-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #667eea;
+        }
+        pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+        }
+        .back-btn:hover {
+            background: #5a67d8;
+        }
+        .button-group {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📄 Детали расчёта #{{ result.id }}</h1>
+        
+        <div class="detail-card">
+            <div class="detail-item">
+                <span class="detail-label">Тип одежды:</span> {{ result.clothing_type }}
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Размер:</span> {{ result.size }}
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Общая стоимость:</span> {{ result.total_cost }} руб.
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Дата расчёта:</span> {{ result.created_at }}
+            </div>
+        </div>
+        
+        <h3>📊 Детальная информация:</h3>
+        <pre>{{ result.details | tojson(indent=2) }}</pre>
+        
+        <div class="button-group">
+            <a href="/history" class="back-btn">← К истории расчётов</a>
+            <a href="/" class="back-btn" style="margin-left: 10px;">🏠 На главную</a>
+        </div>
+    </div>
+</body>
+</html>
