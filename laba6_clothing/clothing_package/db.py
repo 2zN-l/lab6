@@ -25,7 +25,6 @@ class DatabaseManager:
             with self._get_connection() as conn:
                 conn.execute(create_table_query)
                 conn.commit()
-                print("Таблица 'calculations' успешно создана в SQLite")
         except Exception as e:
             print(f"Ошибка при создании таблицы: {e}")
 
@@ -57,7 +56,6 @@ class DatabaseManager:
             return False
 
     def get_all_results(self) -> list:
-        """Возвращает все сохранённые результаты."""
         try:
             with self._get_connection() as conn:
                 cursor = conn.execute("""
@@ -71,7 +69,6 @@ class DatabaseManager:
             return []
 
     def get_result_by_id(self, result_id: int) -> dict:
-        """Возвращает конкретный результат по ID."""
         try:
             with self._get_connection() as conn:
                 cursor = conn.execute("""
