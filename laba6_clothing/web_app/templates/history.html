@@ -2,8 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>История расчётов</title>
     <style>
+        * { box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -12,98 +14,73 @@
             min-height: 100vh;
         }
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
+        }
+        .header {
+            background: #2d3748;
+            color: white;
             padding: 30px;
-        }
-        h1 {
             text-align: center;
-            color: #2d3748;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        th {
-            background: #667eea;
-            color: white;
-        }
-        tr:hover {
-            background: #f7fafc;
-        }
-        a {
-            color: #667eea;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .back-btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
-            border-radius: 10px;
-            text-decoration: none;
-        }
-        .back-btn:hover {
-            background: #5a67d8;
-        }
-        .empty-message {
-            text-align: center;
-            color: gray;
-            padding: 40px;
-        }
+        .header h1 { margin: 0; font-size: 28px; }
+        .content { padding: 30px; }
+        .back-link { margin-bottom: 20px; }
+        .back-link a { color: #667eea; text-decoration: none; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #edf2f7; font-weight: bold; color: #2d3748; }
+        tr:hover { background: #f7fafc; }
+        .view-link { color: #667eea; text-decoration: none; font-weight: bold; }
+        .empty-state { text-align: center; padding: 40px; color: #718096; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📜 История всех расчётов</h1>
-        
-        {% if results %}
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Тип одежды</th>
-                    <th>Размер</th>
-                    <th>Стоимость (руб)</th>
-                    <th>Дата сохранения</th>
-                    <th>Детали</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in results %}
-                <tr>
-                    <td>{{ row[0] }}</td>
-                    <td>{{ row[1] }}</td>
-                    <td>{{ row[2] }}</td>
-                    <td>{{ row[3] }}</td>
-                    <td>{{ row[4] }}</td>
-                    <td><a href="{{ url_for('view_result', result_id=row[0]) }}">👁️ Смотреть</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div class="empty-message">
-            <p>Пока нет сохранённых расчётов.</p>
-            <p>Выполните расчёт на главной странице и нажмите "Сохранить в БД".</p>
+        <div class="header">
+            <h1>История расчётов</h1>
+            <p>PostgreSQL</p>
         </div>
-        {% endif %}
-        
-        <div style="text-align: center;">
-            <a href="/" class="back-btn">← На главную</a>
+        <div class="content">
+            <div class="back-link">
+                <a href="/">← Назад к калькулятору</a>
+            </div>
+
+            {% if results %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Дата</th>
+                        <th>Тип</th>
+                        <th>Размер</th>
+                        <th>Итого (руб)</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td>{{ result.id }}</td>
+                        <td>{{ result.saved_at or 'Не указана' }}</td>
+                        <td>{{ result.type }}</td>
+                        <td>{{ result.size }}</td>
+                        <td>{{ result.total }}</td>
+                        <td><a href="{{ url_for('view_result', result_id=result.id) }}" class="view-link">Детали →</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <p>Нет сохранённых расчётов</p>
+                <p>Выполните расчёт на <a href="/">главной странице</a> и нажмите "Сохранить в PostgreSQL"</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 </body>

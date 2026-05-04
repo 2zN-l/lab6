@@ -3,14 +3,15 @@ import json
 import io
 import sys
 import os
+from datetime import datetime
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from clothing_package import CoatCalculator, TrousersCalculator, SuitCalculator
-from clothing_package.db import DatabaseManager
+from clothing_package.db_postgres import DatabaseManager
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-here-change-in-production'
+app.secret_key = 'your-secret-key-here'
 
 db_manager = DatabaseManager()
 
@@ -208,13 +209,14 @@ def save_to_db():
     
     try:
         result = json.loads(result_json)
+        result['saved_at'] = datetime.now().isoformat()
         success = db_manager.save_result(result)
         if success:
-            flash('Результат успешно сохранён в базу данных SQLite!', 'success')
+            flash('Результат успешно сохранён в PostgreSQL!', 'success')
         else:
-            flash('Ошибка при сохранении в БД.', 'error')
+            flash('Ошибка при сохранении в PostgreSQL', 'error')
     except Exception as e:
-        flash(f'Ошибка при сохранении в БД: {str(e)}', 'error')
+        flash(f'Ошибка: {str(e)}', 'error')
     
     return redirect(url_for('index'))
 
@@ -233,7 +235,7 @@ def export_doc():
                         download_name=f"{result['type']}_{result['size']}.docx", 
                         mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
     except Exception as e:
-        flash(f'Ошибка при экспорте в DOC: {str(e)}', 'error')
+        flash(f'Ошибка: {str(e)}', 'error')
         return redirect(url_for('index'))
 
 @app.route('/export_xls')
@@ -251,18 +253,16 @@ def export_xls():
                         download_name=f"{result['type']}_{result['size']}.xlsx", 
                         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     except Exception as e:
-        flash(f'Ошибка при экспорте в XLS: {str(e)}', 'error')
+        flash(f'Ошибка: {str(e)}', 'error')
         return redirect(url_for('index'))
 
 @app.route('/history')
 def history():
-    """Показывает все сохранённые расчёты из БД."""
     results = db_manager.get_all_results()
     return render_template('history.html', results=results)
 
 @app.route('/result/<int:result_id>')
 def view_result(result_id):
-    """Показывает детали конкретного расчёта по ID."""
     result = db_manager.get_result_by_id(result_id)
     if result:
         return render_template('result_detail.html', result=result)

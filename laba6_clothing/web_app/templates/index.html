@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Расчёт стоимости пошива одежды</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -29,50 +27,21 @@
             padding: 30px;
             text-align: center;
         }
-        .header h1 {
-            margin: 0;
-            font-size: 28px;
-        }
-        .header p {
-            margin: 10px 0 0;
-            opacity: 0.8;
-        }
-        .content {
-            padding: 30px;
-        }
-        .history-link {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .history-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .history-link a:hover {
-            text-decoration: underline;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #2d3748;
-        }
+        .header h1 { margin: 0; font-size: 28px; }
+        .header p { margin: 10px 0 0; opacity: 0.8; }
+        .content { padding: 30px; }
+        .history-link { text-align: center; margin-bottom: 20px; }
+        .history-link a { color: #667eea; text-decoration: none; font-weight: bold; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: #2d3748; }
         select, input {
             width: 100%;
             padding: 10px;
             border: 2px solid #e2e8f0;
             border-radius: 10px;
             font-size: 16px;
-            transition: border-color 0.3s;
         }
-        select:focus, input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+        select:focus, input:focus { outline: none; border-color: #667eea; }
         .calc-btn {
             background: #667eea;
             color: white;
@@ -81,22 +50,15 @@
             border-radius: 10px;
             font-size: 16px;
             cursor: pointer;
-            transition: background 0.3s;
             width: 100%;
         }
-        .calc-btn:hover {
-            background: #5a67d8;
-        }
+        .calc-btn:hover { background: #5a67d8; }
         .result {
             margin-top: 30px;
             padding: 20px;
             background: #f7fafc;
             border-radius: 10px;
             border-left: 4px solid #667eea;
-        }
-        .result h3 {
-            margin-top: 0;
-            color: #2d3748;
         }
         .result pre {
             background: white;
@@ -113,10 +75,7 @@
             margin-top: 20px;
             flex-wrap: wrap;
         }
-        .save-buttons form {
-            flex: 1;
-            min-width: 120px;
-        }
+        .save-buttons form { flex: 1; min-width: 120px; }
         .save-buttons button {
             width: 100%;
             background: #48bb78;
@@ -126,43 +85,27 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
-            transition: background 0.3s;
         }
-        .save-buttons button:nth-child(2) {
-            background: #4299e1;
-        }
-        .save-buttons button:nth-child(3) {
-            background: #ed8936;
-        }
-        .save-buttons button:hover {
-            filter: brightness(0.9);
-        }
+        .save-buttons button:nth-child(2) { background: #4299e1; }
+        .save-buttons button:nth-child(3) { background: #ed8936; }
         .flash-message {
             padding: 12px;
             border-radius: 8px;
             margin-bottom: 20px;
         }
-        .flash-success {
-            background: #c6f6d5;
-            color: #22543d;
-            border: 1px solid #9ae6b4;
-        }
-        .flash-error {
-            background: #fed7d7;
-            color: #742a2a;
-            border: 1px solid #fc8181;
-        }
+        .flash-success { background: #c6f6d5; color: #22543d; border: 1px solid #9ae6b4; }
+        .flash-error { background: #fed7d7; color: #742a2a; border: 1px solid #fc8181; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>👔 Расчёт стоимости пошива одежды</h1>
+            <h1>Расчёт стоимости пошива одежды</h1>
             <p>Вариант 10: Пиджак, Брюки, Костюм-тройка</p>
         </div>
         <div class="content">
             <div class="history-link">
-                <a href="/history">📜 Посмотреть историю всех расчётов</a>
+                <a href="/history">Посмотреть историю всех расчётов</a>
             </div>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -191,21 +134,21 @@
 
             {% if result %}
             <div class="result">
-                <h3>📊 Результат расчёта:</h3>
+                <h3>Результат расчёта:</h3>
                 <pre>{{ result_text }}</pre>
                 
                 <div class="save-buttons">
                     <form method="POST" action="{{ url_for('save_to_db') }}">
                         <input type="hidden" name="result_json" value="{{ result_json }}">
-                        <button type="submit">💾 Сохранить в БД</button>
+                        <button type="submit">Сохранить в PostgreSQL</button>
                     </form>
                     <form method="GET" action="{{ url_for('export_doc') }}">
                         <input type="hidden" name="result_json" value="{{ result_json }}">
-                        <button type="submit">📄 Сохранить в DOC</button>
+                        <button type="submit">Сохранить в DOC</button>
                     </form>
                     <form method="GET" action="{{ url_for('export_xls') }}">
                         <input type="hidden" name="result_json" value="{{ result_json }}">
-                        <button type="submit">📊 Сохранить в XLS</button>
+                        <button type="submit">Сохранить в XLS</button>
                     </form>
                 </div>
             </div>

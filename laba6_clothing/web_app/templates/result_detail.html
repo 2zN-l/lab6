@@ -2,8 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Детали расчёта</title>
     <style>
+        * { box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -18,79 +20,122 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
-            padding: 30px;
         }
-        h1 {
-            color: #2d3748;
+        .header {
+            background: #2d3748;
+            color: white;
+            padding: 30px;
             text-align: center;
         }
+        .content { padding: 30px; }
+        .back-link { margin-bottom: 20px; }
+        .back-link a { color: #667eea; text-decoration: none; font-weight: bold; }
         .detail-card {
             background: #f7fafc;
             border-radius: 15px;
             padding: 20px;
-            margin: 20px 0;
+            margin-bottom: 20px;
         }
-        .detail-item {
-            margin: 10px 0;
+        .detail-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .detail-label { width: 40%; font-weight: bold; color: #4a5568; }
+        .detail-value { width: 60%; color: #2d3748; }
+        .total-row {
+            background: #e9d8fd;
+            margin-top: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .sub-section {
+            margin: 15px 0;
             padding: 10px;
             background: white;
-            border-radius: 8px;
-        }
-        .detail-label {
-            font-weight: bold;
-            color: #667eea;
-        }
-        pre {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 15px;
-            border-radius: 8px;
-            overflow-x: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-        }
-        .back-btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
             border-radius: 10px;
-            text-decoration: none;
         }
-        .back-btn:hover {
-            background: #5a67d8;
-        }
-        .button-group {
-            text-align: center;
-        }
+        .sub-title { font-weight: bold; color: #667eea; margin-bottom: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📄 Детали расчёта #{{ result.id }}</h1>
-        
-        <div class="detail-card">
-            <div class="detail-item">
-                <span class="detail-label">Тип одежды:</span> {{ result.clothing_type }}
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Размер:</span> {{ result.size }}
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Общая стоимость:</span> {{ result.total_cost }} руб.
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Дата расчёта:</span> {{ result.created_at }}
-            </div>
+        <div class="header">
+            <h1>Детали расчёта</h1>
+            <p>Данные из PostgreSQL</p>
         </div>
-        
-        <h3>📊 Детальная информация:</h3>
-        <pre>{{ result.details | tojson(indent=2) }}</pre>
-        
-        <div class="button-group">
-            <a href="/history" class="back-btn">← К истории расчётов</a>
-            <a href="/" class="back-btn" style="margin-left: 10px;">🏠 На главную</a>
+        <div class="content">
+            <div class="back-link">
+                <a href="/history">← Назад к истории</a>
+                | <a href="/">← На главную</a>
+            </div>
+
+            {% if result %}
+            <div class="detail-card">
+                <div class="detail-row">
+                    <div class="detail-label">ID в PostgreSQL:</div>
+                    <div class="detail-value">{{ result.id }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Дата сохранения:</div>
+                    <div class="detail-value">{{ result.saved_at or 'Не указана' }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Тип одежды:</div>
+                    <div class="detail-value">{{ result.type }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Размер:</div>
+                    <div class="detail-value">{{ result.size }}</div>
+                </div>
+            </div>
+
+            {% if result.coat %}
+            <div class="detail-card">
+                <div class="sub-section">
+                    <div class="sub-title">Пиджак</div>
+                    <div class="detail-row"><div class="detail-label">Расход ткани:</div><div class="detail-value">{{ result.coat.fabric_meters }} м</div></div>
+                    <div class="detail-row"><div class="detail-label">Стоимость ткани:</div><div class="detail-value">{{ result.coat.fabric_cost }} руб</div></div>
+                    <div class="detail-row"><div class="detail-label">Стоимость работы:</div><div class="detail-value">{{ result.coat.work_cost }} руб</div></div>
+                    <div class="detail-row"><div class="detail-label">Фурнитура:</div><div class="detail-value">{{ result.coat.accessories }} руб</div></div>
+                    <div class="detail-row"><div class="detail-label">Итого:</div><div class="detail-value"><strong>{{ result.coat.total }} руб</strong></div></div>
+                </div>
+                <div class="sub-section">
+                    <div class="sub-title">Брюки</div>
+                    <div class="detail-row"><div class="detail-label">Расход ткани:</div><div class="detail-value">{{ result.trousers.fabric_meters }} м</div></div>
+                    <div class="detail-row"><div class="detail-label">Стоимость ткани:</div><div class="detail-value">{{ result.trousers.fabric_cost }} руб</div></div>
+                    <div class="detail-row"><div class="detail-label">Стоимость работы:</div><div class="detail-value">{{ result.trousers.work_cost }} руб</div></div>
+                    <div class="detail-row"><div class="detail-label">Фурнитура:</div><div class="detail-value">{{ result.trousers.accessories }} руб</div></div>
+                    <div class="detail-row"><div class="detail-label">Итого:</div><div class="detail-value"><strong>{{ result.trousers.total }} руб</strong></div></div>
+                </div>
+                <div class="sub-section">
+                    <div class="sub-title">Жилет</div>
+                    <div class="detail-row"><div class="detail-label">Расход ткани:</div><div class="detail-value">{{ result.vest.fabric_meters }} м</div></div>
+                    <div class="detail-row"><div class="detail-label">Стоимость ткани:</div><div class="detail-value">{{ result.vest.fabric_cost }} руб</div></div>
+                    <div class="detail-row"><div class="detail-label">Стоимость работы:</div><div class="detail-value">{{ result.vest.work_cost }} руб</div></div>
+                    <div class="detail-row"><div class="detail-label">Фурнитура:</div><div class="detail-value">{{ result.vest.accessories }} руб</div></div>
+                    <div class="detail-row"><div class="detail-label">Итого:</div><div class="detail-value"><strong>{{ result.vest.total }} руб</strong></div></div>
+                </div>
+                <div class="total-row">
+                    ОБЩАЯ СТОИМОСТЬ КОСТЮМА-ТРОЙКИ: {{ result.total }} руб
+                </div>
+            </div>
+            {% else %}
+            <div class="detail-card">
+                <div class="detail-row"><div class="detail-label">Расход ткани:</div><div class="detail-value">{{ result.fabric_meters }} м</div></div>
+                <div class="detail-row"><div class="detail-label">Стоимость ткани:</div><div class="detail-value">{{ result.fabric_cost }} руб</div></div>
+                <div class="detail-row"><div class="detail-label">Стоимость работы:</div><div class="detail-value">{{ result.work_cost }} руб</div></div>
+                <div class="detail-row"><div class="detail-label">Фурнитура:</div><div class="detail-value">{{ result.accessories }} руб</div></div>
+                <div class="total-row">ИТОГО: {{ result.total }} руб</div>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="empty-state">
+                <p>Расчёт не найден</p>
+                <a href="/history">Вернуться к истории</a>
+            </div>
+            {% endif %}
         </div>
     </div>
 </body>

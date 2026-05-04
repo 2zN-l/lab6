@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from clothing_package import CoatCalculator, TrousersCalculator, SuitCalculator
-from clothing_package.db import DatabaseManager
+from laba6_clothing.clothing_package.db_postgres import DatabaseManager
 from docx import Document
 from openpyxl import Workbook
 

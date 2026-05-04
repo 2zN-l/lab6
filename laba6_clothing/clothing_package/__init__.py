@@ -1,5 +1,6 @@
-from .coat import CoatCalculator
-from .trousers import TrousersCalculator
-from .suit import SuitCalculator
+from . import coat
+from . import trousers
+from . import suit
+from . import db_postgres
 
-__all__ = ['CoatCalculator', 'TrousersCalculator', 'SuitCalculator']
+__all__ = ['coat', 'trousers', 'suit', 'db_postgres']
